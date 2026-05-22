@@ -73,8 +73,9 @@ function UserProfile() {
     textAlign: 'center',
     padding: 15,
     borderRadius: 12,
-    background: '#fff',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+    background: '#181818',
+    color: '#eaeaea',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
     }
 
     return (
@@ -87,7 +88,8 @@ function UserProfile() {
         gap: 20,
         padding: 20,
         borderRadius: 16,
-        background: '#fff',
+        background: '#181818',
+        color: '#eaeaea',
         boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
         marginBottom: 20
         }}>
@@ -166,7 +168,8 @@ function UserProfile() {
         <div style={{
             padding: 20,
             borderRadius: 16,
-            background: '#fff',
+            background: '#181818',
+            color: '#eaeaea',
             boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
         }}>
 
