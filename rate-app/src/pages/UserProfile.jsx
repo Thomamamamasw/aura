@@ -31,7 +31,7 @@ function UserProfile() {
   }, [username])
 
   const submitRating = async () => {
-    const response = await fetch('http://localhost:5000/rate', {
+    const response = await fetch(`${API_URL}/rate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ function UserProfile() {
 
     alert(data.message || data.error)
 
-    fetch(`http://localhost:5000/ratings/${username}`)
+    fetch(`${API_URL}/ratings/${username}`)
       .then((res) => res.json())
       .then((data) => setRatings(data))
   }

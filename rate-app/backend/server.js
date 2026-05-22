@@ -5,7 +5,10 @@ const bcrypt = require('bcrypt')
 
 const app = express()
 
-app.use(cors({ origin: '*' }))
+app.use(cors({
+  origin: "https://aura-b2dd.vercel.app",
+  credentials: true
+}))
 app.use(express.json())
 
 const db = new Database('database.db')
