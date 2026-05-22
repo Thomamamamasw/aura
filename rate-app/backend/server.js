@@ -5,11 +5,16 @@ const bcrypt = require('bcrypt')
 
 const app = express()
 
-app.use(cors())
+// 🔐 CORS (для продакшена лучше ограничить потом доменом)
+app.use(cors({
+  origin: "*"
+}))
+
 app.use(express.json())
 
 const db = new sqlite3.Database('./database.db')
 
+// USERS
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,6 +25,7 @@ db.run(`
   )
 `)
 
+// RATINGS
 db.run(`
   CREATE TABLE IF NOT EXISTS ratings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,13 +38,16 @@ db.run(`
 `)
 
 app.get('/', (req, res) => {
-  res.json({
-    message: 'Backend работает'
-  })
+  res.json({ message: 'Backend работает' })
 })
 
+/* ---------------- REGISTER ---------------- */
 app.post('/register', (req, res) => {
   const { username, password } = req.body
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' })
+  }
 
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) {
@@ -63,6 +72,8 @@ app.post('/register', (req, res) => {
     )
   })
 })
+
+/* ---------------- LOGIN ---------------- */
 app.post('/login', (req, res) => {
   const { username, password } = req.body
 
@@ -83,96 +94,89 @@ app.post('/login', (req, res) => {
           return res.status(401).json({ error: 'Неверные данные' })
         }
 
+        // ❗ НЕ возвращаем пароль
+        const safeUser = {
+          id: user.id,
+          username: user.username,
+          avatar: user.avatar,
+          bio: user.bio
+        }
+
         res.json({
           message: 'Успешный вход',
-          user
+          user: safeUser
         })
       })
     }
   )
 })
+
+/* ---------------- USERS ---------------- */
 app.get('/users', (req, res) => {
   db.all(
     'SELECT id, username FROM users',
     [],
     (err, users) => {
       if (err) {
-        return res.status(500).json({
-          error: 'Ошибка сервера',
-        })
+        return res.status(500).json({ error: 'Ошибка сервера' })
       }
 
       res.json(users)
     }
   )
 })
+
+/* ---------------- RATE ---------------- */
 app.post('/rate', (req, res) => {
-  const {
-    fromUser,
-    toUser,
-    vibe,
-    style,
-    communication,
-  } = req.body
+  const { fromUser, toUser, vibe, style, communication } = req.body
 
   db.get(
-    `
-    SELECT * FROM ratings
-    WHERE fromUser = ? AND toUser = ?
-    `,
+    `SELECT * FROM ratings WHERE fromUser = ? AND toUser = ?`,
     [fromUser, toUser],
     (err, existingRating) => {
       if (existingRating) {
         return res.status(400).json({
-          error: 'Вы уже оценивали этого пользователя',
+          error: 'Вы уже оценивали этого пользователя'
         })
       }
 
       db.run(
         `
-        INSERT INTO ratings
-        (fromUser, toUser, vibe, style, communication)
+        INSERT INTO ratings (fromUser, toUser, vibe, style, communication)
         VALUES (?, ?, ?, ?, ?)
         `,
         [fromUser, toUser, vibe, style, communication],
         function (err) {
           if (err) {
-            return res.status(500).json({
-              error: 'Ошибка сервера',
-            })
+            return res.status(500).json({ error: 'Ошибка сервера' })
           }
 
-          res.json({
-            message: 'Оценка добавлена',
-          })
+          res.json({ message: 'Оценка добавлена' })
         }
       )
     }
   )
 })
+
+/* ---------------- RATINGS ---------------- */
 app.get('/ratings/:username', (req, res) => {
   const username = req.params.username
 
   db.all(
-    `
-    SELECT * FROM ratings
-    WHERE toUser = ?
-    `,
+    `SELECT * FROM ratings WHERE toUser = ?`,
     [username],
     (err, ratings) => {
       if (err) {
-        return res.status(500).json({
-          error: 'Ошибка сервера',
-        })
+        return res.status(500).json({ error: 'Ошибка сервера' })
       }
 
       res.json(ratings)
     }
   )
 })
-app.post('/update-profile', (req, res) => {
-  console.log(req.body)
 
+/* ---------------- PROFILE UPDATE ---------------- */
+app.post('/update-profile', (req, res) => {
   const { username, avatar, bio } = req.body
 
   db.run(
@@ -184,19 +188,15 @@ app.post('/update-profile', (req, res) => {
     [avatar, bio, username],
     function (err) {
       if (err) {
-        console.log(err)
-
-        return res.status(500).json({
-          error: 'Ошибка сервера',
-        })
+        return res.status(500).json({ error: 'Ошибка сервера' })
       }
 
-      res.json({
-        message: 'Профиль обновлен',
-      })
+      res.json({ message: 'Профиль обновлен' })
     }
   )
 })
+
+/* ---------------- USER ---------------- */
 app.get('/user/:username', (req, res) => {
   const username = req.params.username
 
@@ -209,15 +209,15 @@ app.get('/user/:username', (req, res) => {
     [username],
     (err, user) => {
       if (err) {
-        return res.status(500).json({
-          error: 'Ошибка сервера',
-        })
+        return res.status(500).json({ error: 'Ошибка сервера' })
       }
 
       res.json(user)
     }
   )
 })
+
+/* ---------------- TOP USERS ---------------- */
 app.get('/top-users', (req, res) => {
   db.all(
     `
@@ -225,17 +225,14 @@ app.get('/top-users', (req, res) => {
       u.username,
       u.avatar,
       u.bio,
-
       IFNULL(AVG(r.vibe), 0) as vibe,
       IFNULL(AVG(r.style), 0) as style,
       IFNULL(AVG(r.communication), 0) as communication,
-
       (
         IFNULL(AVG(r.vibe), 0) +
         IFNULL(AVG(r.style), 0) +
         IFNULL(AVG(r.communication), 0)
       ) / 3 as overall
-
     FROM users u
     LEFT JOIN ratings r ON u.username = r.toUser
     GROUP BY u.username
@@ -254,6 +251,8 @@ app.get('/top-users', (req, res) => {
     }
   )
 })
+
+/* ---------------- START SERVER ---------------- */
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {
