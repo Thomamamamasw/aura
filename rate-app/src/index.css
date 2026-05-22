@@ -4,10 +4,11 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   background: #0f0f0f;
   color: white;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
 }
 
 a {
@@ -87,30 +88,6 @@ button:hover {
 }
 /* ===== DARK THEME ===== */
 
-body.dark {
-  background: #0f0f0f;
-  color: #eaeaea;
-}
-
-/* карточки */
-body.dark .card {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  color: #eaeaea;
-}
-
-/* ссылки */
-body.dark a {
-  color: #4da3ff;
-}
-
-/* кнопки */
-body.dark button {
-  background: #2a2a2a;
-  color: white;
-  border: 1px solid #444;
-}
-
 /* navbar */
 body.dark nav,
 body.dark div[style*="border-bottom"] {
@@ -166,4 +143,9 @@ a:hover {
   button {
     width: 100%;
   }
+}
+
+#root {
+  min-height: 100vh;
+  background: #0f0f0f;
 }
