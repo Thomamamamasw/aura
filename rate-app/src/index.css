@@ -1,0 +1,169 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0f0f0f;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+.navbar {
+  height: 70px;
+  background: #181818;
+  border-bottom: 1px solid #2c2c2c;
+
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding: 0 30px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 30px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+
+  background: #1d1d1d;
+  border: 1px solid #333;
+
+  color: white;
+
+  border-radius: 10px;
+
+  outline: none;
+}
+
+button {
+  padding: 14px 20px;
+
+  background: #5b5bff;
+  border: none;
+
+  color: white;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 16px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: #181818;
+
+  border: 1px solid #2d2d2d;
+
+  padding: 20px;
+
+  border-radius: 16px;
+
+  margin-bottom: 20px;
+}
+
+.rating {
+  margin-top: 10px;
+}
+
+.rating p {
+  margin-bottom: 10px;
+}
+/* ===== DARK THEME ===== */
+
+body.dark {
+  background: #0f0f0f;
+  color: #eaeaea;
+}
+
+/* карточки */
+body.dark .card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #eaeaea;
+}
+
+/* ссылки */
+body.dark a {
+  color: #4da3ff;
+}
+
+/* кнопки */
+body.dark button {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+/* navbar */
+body.dark nav,
+body.dark div[style*="border-bottom"] {
+  background: #121212;
+  border-color: #2a2a2a;
+}
+/* ===== SMOOTH ANIMATIONS ===== */
+
+.card {
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* кнопки */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+/* ссылки */
+a {
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+/* ===== MOBILE ===== */
+
+@media (max-width: 600px) {
+
+  .card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  img {
+    margin: 0 auto;
+  }
+
+  input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 100%;
+  }
+}
