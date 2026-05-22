@@ -5,13 +5,12 @@ const bcrypt = require('bcrypt')
 
 const app = express()
 
-app.use(cors({ origin: "*" }))
+app.use(cors({ origin: '*' }))
 app.use(express.json())
 
-// DB
 const db = new Database('database.db')
 
-/* ---------------- CREATE TABLES ---------------- */
+/* ---------------- TABLES ---------------- */
 db.prepare(`
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,21 +45,19 @@ app.post('/register', (req, res) => {
     return res.status(400).json({ error: 'Заполните все поля' })
   }
 
-  const existing = db.prepare(
+  const exists = db.prepare(
     'SELECT * FROM users WHERE username = ?'
   ).get(username)
 
-  if (existing) {
+  if (exists) {
     return res.status(400).json({ error: 'Пользователь уже существует' })
   }
 
-  const hashedPassword = bcrypt.hashSync(password, 10)
+  const hashed = bcrypt.hashSync(password, 10)
 
-  const stmt = db.prepare(
+  const info = db.prepare(
     'INSERT INTO users (username, password) VALUES (?, ?)'
-  )
-
-  const info = stmt.run(username, hashedPassword)
+  ).run(username, hashed)
 
   res.json({
     message: 'Пользователь создан',
@@ -80,22 +77,20 @@ app.post('/login', (req, res) => {
     return res.status(401).json({ error: 'Неверные данные' })
   }
 
-  const match = bcrypt.compareSync(password, user.password)
+  const ok = bcrypt.compareSync(password, user.password)
 
-  if (!match) {
+  if (!ok) {
     return res.status(401).json({ error: 'Неверные данные' })
   }
 
-  const safeUser = {
-    id: user.id,
-    username: user.username,
-    avatar: user.avatar,
-    bio: user.bio
-  }
-
   res.json({
-    message: 'Успешный вход',
-    user: safeUser
+    message: 'OK',
+    user: {
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      bio: user.bio
+    }
   })
 })
 
@@ -117,9 +112,7 @@ app.post('/rate', (req, res) => {
   ).get(fromUser, toUser)
 
   if (exists) {
-    return res.status(400).json({
-      error: 'Вы уже оценивали этого пользователя'
-    })
+    return res.status(400).json({ error: 'Уже оценивал' })
   }
 
   db.prepare(`
@@ -163,7 +156,7 @@ app.get('/user/:username', (req, res) => {
 
 /* ---------------- TOP USERS ---------------- */
 app.get('/top-users', (req, res) => {
-  const users = db.prepare(`
+  const rows = db.prepare(`
     SELECT 
       u.username,
       u.avatar,
@@ -181,16 +174,16 @@ app.get('/top-users', (req, res) => {
     GROUP BY u.username
   `).all()
 
-  const top = users
+  const top = rows
     .sort((a, b) => b.overall - a.overall)
     .slice(0, 10)
 
   res.json(top)
 })
 
-/* ---------------- START ---------------- */
+/* ---------------- START SERVER ---------------- */
 const PORT = process.env.PORT || 5000
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log('Server running on port', PORT)
 })
