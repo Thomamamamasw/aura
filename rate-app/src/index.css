@@ -149,3 +149,25 @@ a:hover {
   min-height: 100vh;
   background: #0f0f0f;
 }
+#root, body, html {
+  background: #0f0f0f !important;
+}
+
+div {
+  background-color: transparent;
+}
+/* ===== FIX WHITE TOP AREA ===== */
+
+html, body, #root {
+  background: #0f0f0f !important;
+}
+
+/* на случай если navbar не .navbar, а nav/header */
+nav, header {
+  background: #181818 !important;
+}
+
+/* страховка от белых wrapper div'ов */
+#root > div {
+  background: #0f0f0f;
+}
