@@ -20,26 +20,30 @@ app.use(express.json())
 
 
 /* ---------------- TABLES ---------------- */
-db.prepare(`
-CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE,
-  password TEXT,
-  avatar TEXT,
-  bio TEXT
-)
-`).run()
+async function initDB() {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username TEXT UNIQUE,
+      password TEXT,
+      avatar TEXT,
+      bio TEXT
+    )
+  `)
 
-db.prepare(`
-CREATE TABLE IF NOT EXISTS ratings (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  fromUser TEXT,
-  toUser TEXT,
-  vibe INTEGER,
-  style INTEGER,
-  communication INTEGER
-)
-`).run()
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS ratings (
+      id SERIAL PRIMARY KEY,
+      fromUser TEXT,
+      toUser TEXT,
+      vibe INTEGER,
+      style INTEGER,
+      communication INTEGER
+    )
+  `)
+}
+
+initDB()
 
 /* ---------------- HOME ---------------- */
 app.get('/', (req, res) => {
