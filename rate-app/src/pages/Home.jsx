@@ -31,9 +31,9 @@ function Home() {
             gap: 15,
             padding: 15,
             borderRadius: 12,
-            border: '1px solid #eee',
+            border: '1px solid #2a2a2a',
             marginBottom: 12,
-            background: '#fff',
+            background: '#181818',
             transition: '0.2s',
             alignItems: 'center'
           }}
@@ -84,7 +84,7 @@ function Home() {
 
               <span style={{
                 fontWeight: 600,
-                color: '#555'
+                color: '#eaeaea'
               }}>
                 ⭐ {Number(user.overall).toFixed(1)}
               </span>
@@ -92,14 +92,14 @@ function Home() {
 
             <p style={{
               margin: '5px 0',
-              color: '#666'
+              color: '#eaeaea'
             }}>
               {user.bio || 'Нет описания'}
             </p>
 
             <div style={{
               fontSize: 13,
-              color: '#777'
+              color: '#eaeaea'
             }}>
               🔥 {Number(user.vibe).toFixed(1)} |
               ✨ {Number(user.style).toFixed(1)} |
