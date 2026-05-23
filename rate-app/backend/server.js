@@ -1,7 +1,14 @@
 const express = require('express')
 const cors = require('cors')
-const Database = require('better-sqlite3')
 const bcrypt = require('bcrypt')
+const { Pool } = require('pg')
+
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+})
 
 const app = express()
 
@@ -11,7 +18,6 @@ app.use(cors({
 }))
 app.use(express.json())
 
-const db = new Database('database.db')
 
 /* ---------------- TABLES ---------------- */
 db.prepare(`
@@ -41,40 +47,47 @@ app.get('/', (req, res) => {
 })
 
 /* ---------------- REGISTER ---------------- */
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, password } = req.body
 
   if (!username || !password) {
     return res.status(400).json({ error: 'Заполните все поля' })
   }
 
-  const exists = db.prepare(
-    'SELECT * FROM users WHERE username = ?'
-  ).get(username)
+  const existing = await db.query(
+    'SELECT * FROM users WHERE username = $1',
+    [username]
+  )
 
-  if (exists) {
-    return res.status(400).json({ error: 'Пользователь уже существует' })
+  if (existing.rows.length > 0) {
+    return res.status(400).json({
+      error: 'Пользователь уже существует'
+    })
   }
 
   const hashed = bcrypt.hashSync(password, 10)
 
-  const info = db.prepare(
-    'INSERT INTO users (username, password) VALUES (?, ?)'
-  ).run(username, hashed)
+  const result = await db.query(
+    'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
+    [username, hashed]
+  )
 
   res.json({
     message: 'Пользователь создан',
-    id: info.lastInsertRowid
+    id: result.rows[0].id
   })
 })
 
 /* ---------------- LOGIN ---------------- */
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body
 
-  const user = db.prepare(
-    'SELECT * FROM users WHERE username = ?'
-  ).get(username)
+  const result = await db.query(
+    'SELECT * FROM users WHERE username = $1',
+    [username]
+  )
+
+  const user = result.rows[0]
 
   if (!user) {
     return res.status(401).json({ error: 'Неверные данные' })
@@ -98,86 +111,111 @@ app.post('/login', (req, res) => {
 })
 
 /* ---------------- USERS ---------------- */
-app.get('/users', (req, res) => {
-  const users = db.prepare(
+app.get('/users', async (req, res) => {
+  const result = await db.query(
     'SELECT id, username FROM users'
-  ).all()
+  )
 
-  res.json(users)
+  res.json(result.rows)
 })
 
 /* ---------------- RATE ---------------- */
-app.post('/rate', (req, res) => {
+app.post('/rate', async (req, res) => {
   const { fromUser, toUser, vibe, style, communication } = req.body
 
-  const exists = db.prepare(
-    'SELECT * FROM ratings WHERE fromUser = ? AND toUser = ?'
-  ).get(fromUser, toUser)
+  const existing = await db.query(
+    'SELECT * FROM ratings WHERE fromUser = $1 AND toUser = $2',
+    [fromUser, toUser]
+  )
 
-  if (exists) {
-    return res.status(400).json({ error: 'Уже оценивал' })
+  if (existing.rows.length > 0) {
+    return res.status(400).json({
+      error: 'Уже оценивал'
+    })
   }
 
-  db.prepare(`
-    INSERT INTO ratings (fromUser, toUser, vibe, style, communication)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(fromUser, toUser, vibe, style, communication)
+  await db.query(
+    `
+    INSERT INTO ratings
+    (fromUser, toUser, vibe, style, communication)
+    VALUES ($1, $2, $3, $4, $5)
+    `,
+    [fromUser, toUser, vibe, style, communication]
+  )
 
-  res.json({ message: 'Оценка добавлена' })
+  res.json({
+    message: 'Оценка добавлена'
+  })
 })
 
 /* ---------------- RATINGS ---------------- */
-app.get('/ratings/:username', (req, res) => {
-  const ratings = db.prepare(
-    'SELECT * FROM ratings WHERE toUser = ?'
-  ).all(req.params.username)
+app.get('/ratings/:username', async (req, res) => {
+  const result = await db.query(
+    'SELECT * FROM ratings WHERE toUser = $1',
+    [req.params.username]
+  )
 
-  res.json(ratings)
+  res.json(result.rows)
 })
 
 /* ---------------- UPDATE PROFILE ---------------- */
-app.post('/update-profile', (req, res) => {
+app.post('/update-profile', async (req, res) => {
   const { username, avatar, bio } = req.body
 
-  db.prepare(`
+  await db.query(
+    `
     UPDATE users
-    SET avatar = ?, bio = ?
-    WHERE username = ?
-  `).run(avatar, bio, username)
+    SET avatar = $1, bio = $2
+    WHERE username = $3
+    `,
+    [avatar, bio, username]
+  )
 
-  res.json({ message: 'Профиль обновлен' })
+  res.json({
+    message: 'Профиль обновлен'
+  })
 })
 
 /* ---------------- USER ---------------- */
-app.get('/user/:username', (req, res) => {
-  const user = db.prepare(
-    'SELECT id, username, avatar, bio FROM users WHERE username = ?'
-  ).get(req.params.username)
+app.get('/user/:username', async (req, res) => {
+  const result = await db.query(
+    `
+    SELECT id, username, avatar, bio
+    FROM users
+    WHERE username = $1
+    `,
+    [req.params.username]
+  )
 
-  res.json(user)
+  res.json(result.rows[0])
 })
 
 /* ---------------- TOP USERS ---------------- */
-app.get('/top-users', (req, res) => {
-  const rows = db.prepare(`
+app.get('/top-users', async (req, res) => {
+  const result = await db.query(`
     SELECT 
       u.username,
       u.avatar,
       u.bio,
-      IFNULL(AVG(r.vibe), 0) as vibe,
-      IFNULL(AVG(r.style), 0) as style,
-      IFNULL(AVG(r.communication), 0) as communication,
-      (
-        IFNULL(AVG(r.vibe), 0) +
-        IFNULL(AVG(r.style), 0) +
-        IFNULL(AVG(r.communication), 0)
-      ) / 3 as overall
-    FROM users u
-    LEFT JOIN ratings r ON u.username = r.toUser
-    GROUP BY u.username
-  `).all()
 
-  const top = rows
+      COALESCE(AVG(r.vibe), 0) as vibe,
+      COALESCE(AVG(r.style), 0) as style,
+      COALESCE(AVG(r.communication), 0) as communication,
+
+      (
+        COALESCE(AVG(r.vibe), 0) +
+        COALESCE(AVG(r.style), 0) +
+        COALESCE(AVG(r.communication), 0)
+      ) / 3 as overall
+
+    FROM users u
+    LEFT JOIN ratings r
+      ON u.username = r.toUser
+
+    GROUP BY u.username
+  `)
+
+  const top = result.rows
     .sort((a, b) => b.overall - a.overall)
     .slice(0, 10)
 
