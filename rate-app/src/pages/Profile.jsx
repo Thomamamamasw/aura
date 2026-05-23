@@ -5,6 +5,8 @@ function Profile() {
   const localUser = JSON.parse(localStorage.getItem('user'))
 
   const [user, setUser] = useState(null)
+  const [ratings, setRatings] = useState([])
+  const [topUsers, setTopUsers] = useState([])
 
   const [avatar, setAvatar] = useState('')
   const [bio, setBio] = useState('')
@@ -20,8 +22,31 @@ function Profile() {
         setAvatar(data.avatar || '')
         setBio(data.bio || '')
       })
-  }, [])
+      fetch(`${API_URL}/ratings/${localUser.username}`)
+        .then((res) => res.json())
+        .then((data) => setRatings(data))
 
+      fetch(`${API_URL}/top-users`)
+        .then((res) => res.json())
+        .then((data) => setTopUsers(data))
+  }, [])
+  const average = (key) => {
+    if (!ratings.length) return 0
+
+    const total = ratings.reduce((sum, r) => sum + r[key], 0)
+
+    return (total / ratings.length).toFixed(1)
+  }
+
+  const sorted = [...topUsers].sort(
+    (a, b) => b.overall - a.overall
+  )
+
+  const rank = user
+    ? sorted.findIndex(
+        (u) => u.username === user.username
+      ) + 1
+    : null
   if (!localUser) {
     return (
       <div className="card">
@@ -86,6 +111,21 @@ function Profile() {
       <br />
 
       <p>{user?.bio}</p>
+      <br />
+
+      <div className="card">
+        <h3>🏆 Статистика</h3>
+
+        <br />
+
+        <p>🔥 Vibe: {average('vibe')}</p>
+        <p>✨ Style: {average('style')}</p>
+        <p>💬 Chat: {average('communication')}</p>
+
+        <br />
+
+        <p>🏆 Место в топе: #{rank || '-'}</p>
+      </div>
 
       <br />
       <br />
