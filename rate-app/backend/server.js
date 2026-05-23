@@ -196,34 +196,40 @@ app.get('/user/:username', async (req, res) => {
 
 /* ---------------- TOP USERS ---------------- */
 app.get('/top-users', async (req, res) => {
-  const result = await db.query(`
-    SELECT 
-      u.username,
-      u.avatar,
-      u.bio,
+  try {
+    const result = await db.query(`
+      SELECT 
+        u.username,
+        u.avatar,
+        u.bio,
 
-      COALESCE(AVG(r.vibe), 0) as vibe,
-      COALESCE(AVG(r.style), 0) as style,
-      COALESCE(AVG(r.communication), 0) as communication,
+        COALESCE(AVG(r.vibe), 0) AS vibe,
+        COALESCE(AVG(r.style), 0) AS style,
+        COALESCE(AVG(r.communication), 0) AS communication,
 
-      (
-        COALESCE(AVG(r.vibe), 0) +
-        COALESCE(AVG(r.style), 0) +
-        COALESCE(AVG(r.communication), 0)
-      ) / 3 as overall
+        (
+          COALESCE(AVG(r.vibe), 0) +
+          COALESCE(AVG(r.style), 0) +
+          COALESCE(AVG(r.communication), 0)
+        ) / 3 AS overall
 
-    FROM users u
-    LEFT JOIN ratings r
-      ON u.username = r.toUser
+      FROM users u
+      LEFT JOIN ratings r
+        ON u.username = r.toUser
 
-    GROUP BY u.username
-  `)
+      GROUP BY u.username, u.avatar, u.bio
+    `)
 
-  const top = result.rows
-    .sort((a, b) => b.overall - a.overall)
-    .slice(0, 10)
+    const top = result.rows
+      .sort((a, b) => b.overall - a.overall)
+      .slice(0, 10)
 
-  res.json(top)
+    res.json(top)
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: "top-users failed" })
+  }
 })
 
 /* ---------------- START SERVER ---------------- */
