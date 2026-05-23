@@ -12,12 +12,13 @@ function Navbar() {
     padding: '8px 14px',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: '#333',
-    background: '#f2f2f2'
+    color: '#eaeaea',
+    background: '#1f1f1f',
+    border: '1px solid #2d2d2d'
   }
 
   const activeHover = {
-    background: '#e0e0e0'
+    background: '#2a2a2a'
   }
 
   return (
@@ -26,8 +27,8 @@ function Navbar() {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '12px 20px',
-      borderBottom: '1px solid #eee',
-      background: '#fff',
+      borderBottom: '1px solid #2a2a2a',
+      background: '#121212',
       position: 'sticky',
       top: 0
     }}>
@@ -51,7 +52,7 @@ function Navbar() {
         style={{
           padding: '8px 14px',
           borderRadius: '8px',
-          border: '1px solid #ddd',
+          border: '1px solid #2d2d2d',
           background: '#ff4d4f',
           color: 'white',
           cursor: 'pointer'
