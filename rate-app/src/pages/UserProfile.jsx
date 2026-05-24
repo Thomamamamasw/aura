@@ -187,7 +187,7 @@ function UserProfile() {
                 value={vibe}
                 onChange={(e) => setVibe(Number(e.target.value))}
                 style={{
-                background: `linear-gradient(90deg, #ff4d4d ${(vibe - 1) * 11.1}%, #2a2a2a ${(vibe - 1) * 11.1}%)`
+                background: `linear-gradient(90deg, #d66a6a ${(vibe - 1) * 11.1}%, #2a2a2a ${(vibe - 1) * 11.1}%)`
                 }}
             />
             </div>
@@ -202,7 +202,7 @@ function UserProfile() {
                 value={style}
                 onChange={(e) => setStyle(Number(e.target.value))}
                 style={{
-                background: `linear-gradient(90deg, #4da6ff ${(style - 1) * 11.1}%, #2a2a2a ${(style - 1) * 11.1}%)`
+                background: `linear-gradient(90deg, #5f86b3 ${(style - 1) * 11.1}%, #2a2a2a ${(style - 1) * 11.1}%)`
                 }}
             />
             </div>
@@ -217,7 +217,7 @@ function UserProfile() {
                 value={communication}
                 onChange={(e) => setCommunication(Number(e.target.value))}
                 style={{
-                background: `linear-gradient(90deg, #7cff4d ${(communication - 1) * 11.1}%, #2a2a2a ${(communication - 1) * 11.1}%)`
+                background: `linear-gradient(90deg, #5fb3a6 ${(communication - 1) * 11.1}%, #2a2a2a ${(communication - 1) * 11.1}%)`
                 }}
             />
             </div>
