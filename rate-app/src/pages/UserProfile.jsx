@@ -179,65 +179,47 @@ function UserProfile() {
 
             {/* VIBE */}
             <div>
-                <label>🔥 Vibe: {vibe}</label>
-                <input
+            <label>🔥 Vibe: {vibe}</label>
+            <input
                 type="range"
                 min="1"
                 max="10"
                 value={vibe}
                 onChange={(e) => setVibe(Number(e.target.value))}
                 style={{
-                    width: '100%',
-                    height: 6,
-                    borderRadius: 10,
-                    appearance: 'none',
-                    background: `linear-gradient(90deg, #ff4d4d ${(vibe - 1) * 11.1}%, #333 ${(vibe - 1) * 11.1}%)`,
-                    outline: 'none',
-                    boxShadow: '0 0 10px rgba(255, 77, 77, 0.4)',
+                background: `linear-gradient(90deg, #ff4d4d ${(vibe - 1) * 11.1}%, #2a2a2a ${(vibe - 1) * 11.1}%)`
                 }}
-                />
+            />
             </div>
 
             {/* STYLE */}
             <div>
-                <label>✨ Style: {style}</label>
-                <input
+            <label>✨ Style: {style}</label>
+            <input
                 type="range"
                 min="1"
                 max="10"
                 value={style}
                 onChange={(e) => setStyle(Number(e.target.value))}
                 style={{
-                    width: '100%',
-                    height: 6,
-                    borderRadius: 10,
-                    appearance: 'none',
-                    background: `linear-gradient(90deg, #4da6ff ${(style - 1) * 11.1}%, #333 ${(style - 1) * 11.1}%)`,
-                    outline: 'none',
-                    boxShadow: '0 0 10px rgba(77, 166, 255, 0.4)',
+                background: `linear-gradient(90deg, #4da6ff ${(style - 1) * 11.1}%, #2a2a2a ${(style - 1) * 11.1}%)`
                 }}
-                />
+            />
             </div>
 
             {/* CHAT */}
             <div>
-                <label>💬 Chat: {communication}</label>
-                <input
+            <label>💬 Chat: {communication}</label>
+            <input
                 type="range"
                 min="1"
                 max="10"
                 value={communication}
                 onChange={(e) => setCommunication(Number(e.target.value))}
                 style={{
-                    width: '100%',
-                    height: 6,
-                    borderRadius: 10,
-                    appearance: 'none',
-                    background: `linear-gradient(90deg, #7cff4d ${(communication - 1) * 11.1}%, #333 ${(communication - 1) * 11.1}%)`,
-                    outline: 'none',
-                    boxShadow: '0 0 10px rgba(124, 255, 77, 0.4)',
+                background: `linear-gradient(90deg, #7cff4d ${(communication - 1) * 11.1}%, #2a2a2a ${(communication - 1) * 11.1}%)`
                 }}
-                />
+            />
             </div>
 
             </div>
