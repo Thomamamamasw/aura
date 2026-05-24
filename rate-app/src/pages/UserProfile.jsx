@@ -173,8 +173,6 @@ function UserProfile() {
             boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
         }}>
 
-            <h3>⭐ Оценить пользователя</h3>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
 
             {/* VIBE */}
