@@ -175,34 +175,43 @@ function UserProfile() {
 
             <h3>⭐ Оценить пользователя</h3>
 
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
 
-            <input
-                type="number"
+            <div>
+                <label>🔥 Vibe: {vibe}</label>
+                <input
+                type="range"
                 min="1"
                 max="10"
                 value={vibe}
                 onChange={(e) => setVibe(Number(e.target.value))}
-                placeholder="Vibe"
-            />
+                style={{ width: '100%' }}
+                />
+            </div>
 
-            <input
-                type="number"
+            <div>
+                <label>✨ Style: {style}</label>
+                <input
+                type="range"
                 min="1"
                 max="10"
                 value={style}
                 onChange={(e) => setStyle(Number(e.target.value))}
-                placeholder="Style"
-            />
+                style={{ width: '100%' }}
+                />
+            </div>
 
-            <input
-                type="number"
+            <div>
+                <label>💬 Chat: {communication}</label>
+                <input
+                type="range"
                 min="1"
                 max="10"
                 value={communication}
                 onChange={(e) => setCommunication(Number(e.target.value))}
-                placeholder="Chat"
-            />
+                style={{ width: '100%' }}
+                />
+            </div>
 
             </div>
 
